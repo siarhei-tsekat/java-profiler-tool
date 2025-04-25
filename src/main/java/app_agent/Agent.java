@@ -21,7 +21,6 @@ public class Agent {
 //        boolean retransformClassesSupported = inst.isRetransformClassesSupported();
 
         inst.addTransformer(new StringCreationClassFileTransformer(), canRetransform);
-//        inst.addTransformer(new StringConstructorTransformer(), true);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             Counter.printToFile("F:/profiling/string_calls_report.txt");

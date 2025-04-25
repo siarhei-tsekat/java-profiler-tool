@@ -8,10 +8,15 @@ import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
 public
 class StringCreationMethodVisitor extends MethodVisitor {
+    String name;
 
     // Opcodes.ASM9  – Java 15+
-    public StringCreationMethodVisitor(MethodVisitor mv) {
+    public StringCreationMethodVisitor(
+            MethodVisitor mv, int access, String name,
+            String descriptor, String signature, String[] exceptions
+    ) {
         super(Opcodes.ASM9, mv);
+        this.name = name;
     }
 
     @Override
@@ -28,24 +33,24 @@ class StringCreationMethodVisitor extends MethodVisitor {
     public void visitCode() {
         super.visitCode();
 
-//        // Insert System.out.println("Method started!");
-        mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-        mv.visitLdcInsn("Method started!");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+        System.out.println("Method started!");
+
+        super.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+        super.visitLdcInsn("Method started " + name);
+        super.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
     }
 
     @Override
     public void visitTypeInsn(int opcode, String desc) {
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!");
         switch (opcode) {
             case Opcodes.NEW:
-                System.out.println("NEW instance of " + desc);
+                //System.out.println("NEW instance of " + desc);
                 visitAllocateBefore(desc);
                 mv.visitTypeInsn(opcode, desc);
                 visitAllocateAfter(desc);
                 break;
             case Opcodes.ANEWARRAY:
-                System.out.println("Creating an array of desc " + desc);
+                //System.out.println("Creating an array of desc " + desc);
                 String arrayDesc = desc.startsWith("[") ? "[" + desc : "L" + desc + ";";
                 visitAllocateArrayBefore(arrayDesc);
                 mv.visitTypeInsn(opcode, desc);

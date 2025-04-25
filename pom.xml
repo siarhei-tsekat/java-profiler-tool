@@ -53,10 +53,14 @@
                 <!-- Build an executable JAR -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.3.0</version>
                 <configuration>
                     <outputDirectory>F:\profiling</outputDirectory>
                     <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+<!--                            <mainClass>app_agent.Agent</mainClass> &lt;!&ndash; Not needed for agent, optional &ndash;&gt;-->
+                        </manifest>
                         <manifestEntries>
                             <Premain-Class>app_agent.Agent</Premain-Class>
                             <Boot-Class-Path>agent.jar</Boot-Class-Path>
@@ -65,6 +69,29 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Premain-Class>app_agent.Agent</Premain-Class>
+                                        <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
