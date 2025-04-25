@@ -4,7 +4,7 @@ import java.lang.instrument.Instrumentation;
 
 public class Agent {
     public static void premain(String args, Instrumentation inst) {
-        System.out.println("Agent started with args: [" + args + "].");
+        System.out.println("Agent started with args: [" + args + "]");
 
         /**
          *
@@ -26,7 +26,7 @@ public class Agent {
             Counter.printToFile("F:/profiling/string_calls_report.txt");
         }));
 
-        System.out.println("Agent finished.");
+        System.out.println("Agent finished");
     }
 }
 

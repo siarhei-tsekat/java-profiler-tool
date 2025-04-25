@@ -6,60 +6,65 @@ import org.objectweb.asm.Opcodes;
 import static org.objectweb.asm.Opcodes.GETSTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
-public
-class StringCreationMethodVisitor extends MethodVisitor {
-    String name;
+public class StringCreationMethodVisitor extends MethodVisitor {
+    private final String name;
 
     // Opcodes.ASM9  – Java 15+
-    public StringCreationMethodVisitor(
-            MethodVisitor mv, int access, String name,
-            String descriptor, String signature, String[] exceptions
-    ) {
+    public StringCreationMethodVisitor(MethodVisitor mv, int access, String name, String descriptor, String signature, String[] exceptions) {
         super(Opcodes.ASM9, mv);
         this.name = name;
     }
 
+    // Used to insert a simple (zero-operand) instruction into a method. Use it to generate bytecode instructions inside a method body.
+    // opcode: The opcode of the instruction to be visited (usually a constant from Opcodes class, like Opcodes.RETURN, Opcodes.POP, etc.)
+    // Opcodes.RETURN	Return void
+    // Opcodes.IRETURN	Return int
+    // Opcodes.ARETURN	Return object reference
+    // Opcodes.POP	Pop the top stack value
+    // Opcodes.DUP	Duplicate top of stack
+     // Opcodes.NOP	Do nothing
+
     @Override
     public void visitInsn(int opcode) {
-        if (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) {
-            super.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-            super.visitLdcInsn("Method is returning!");
-            super.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
-        }
+//        if (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) {
+//            super.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+//            super.visitLdcInsn("Method is returning!");
+//            super.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+//        }
         super.visitInsn(opcode);
     }
 
+    // marks the start of the method's bytecode instructions.
     @Override
     public void visitCode() {
-        super.visitCode();
-
-        System.out.println("Method started!");
-
-        super.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-        super.visitLdcInsn("Method started " + name);
-        super.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+//        super.visitCode();
+//        super.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+//        super.visitLdcInsn("Method started " + name);
+//        super.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
     }
+
+    // used to emit type-specific JVM bytecode instructions—that is, instructions that operate on a class or interface type.
+    // opcode: One of NEW, ANEWARRAY, CHECKCAST, or INSTANCEOF
+    // desc: The internal name of the class (e.g., java/lang/String), or the type of the array component.
 
     @Override
     public void visitTypeInsn(int opcode, String desc) {
         switch (opcode) {
-            case Opcodes.NEW:
-                //System.out.println("NEW instance of " + desc);
+            case Opcodes.NEW:                   // Create new object
                 visitAllocateBefore(desc);
                 mv.visitTypeInsn(opcode, desc);
                 visitAllocateAfter(desc);
                 break;
-            case Opcodes.ANEWARRAY:
-                //System.out.println("Creating an array of desc " + desc);
+            case Opcodes.ANEWARRAY:             // Create new array of reference type
                 String arrayDesc = desc.startsWith("[") ? "[" + desc : "L" + desc + ";";
                 visitAllocateArrayBefore(arrayDesc);
                 mv.visitTypeInsn(opcode, desc);
                 visitAllocateArrayAfter(arrayDesc);
                 break;
-//            case Opcodes.CHECKCAST:
+//            case Opcodes.CHECKCAST:           // Cast object to specific reference type
 //                System.out.println("Casting to " + desc);
 //                break;
-//            case Opcodes.INSTANCEOF:
+//            case Opcodes.INSTANCEOF:          // Check if object is of given type
 //                System.out.println("Checking instanceof " + desc);
 //                break;
             default:
