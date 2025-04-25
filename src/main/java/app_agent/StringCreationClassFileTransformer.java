@@ -23,7 +23,7 @@ public class StringCreationClassFileTransformer implements ClassFileTransformer 
 
             ClassReader reader = new ClassReader(classfileBuffer);
             ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-            ClassVisitor classVisitor = new MethodClassVisitor(writer);
+            ClassVisitor classVisitor = new MethodClassVisitor(writer, className);
 
             reader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
 

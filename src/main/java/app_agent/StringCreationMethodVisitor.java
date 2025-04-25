@@ -4,15 +4,20 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import static org.objectweb.asm.Opcodes.GETSTATIC;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
 public class StringCreationMethodVisitor extends MethodVisitor {
-    private final String name;
+    private final String methodName;
+    private final String descriptor;
+    private final String signature;
+    private final String className;
 
     // Opcodes.ASM9  – Java 15+
-    public StringCreationMethodVisitor(MethodVisitor mv, int access, String name, String descriptor, String signature, String[] exceptions) {
+    public StringCreationMethodVisitor(MethodVisitor mv, int access, String methodName, String descriptor, String signature, String[] exceptions, String className) {
         super(Opcodes.ASM9, mv);
-        this.name = name;
+        this.methodName = methodName;
+        this.signature = signature;
+        this.descriptor = descriptor;
+        this.className = className;
     }
 
     // Used to insert a simple (zero-operand) instruction into a method. Use it to generate bytecode instructions inside a method body.
@@ -78,10 +83,27 @@ public class StringCreationMethodVisitor extends MethodVisitor {
 
     private void visitAllocateBefore(String desc) {
         mv.visitCode();
-        mv.visitFieldInsn(GETSTATIC, "app_agent/Counter", "stringConstructorCalls", "I");
-        mv.visitInsn(Opcodes.ICONST_1);
-        mv.visitInsn(Opcodes.IADD);
-        mv.visitFieldInsn(Opcodes.PUTSTATIC, "app_agent/Counter", "stringConstructorCalls", "I");
+
+        // This will generate bytecode that calls Counter.increment("com.example.Main::myMethod()V").
+
+        // In ASM, you use visitLdcInsn to insert an LDC(Load Constant) instruction into a method.
+        // This puts the string "location" onto the stack at that point in the method's bytecode.
+
+        String location = className.replace('/', '.') + "::" + methodName + descriptor; // com.example.Main::<init>()
+        mv.visitLdcInsn(location);
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC,
+                "app_agent/Counter",
+                "increment",
+                "(Ljava/lang/String;)V",
+                false
+        );
+
+
+
+//        mv.visitFieldInsn(GETSTATIC, "app_agent/Counter", "stringConstructorCalls", "I");
+//        mv.visitInsn(Opcodes.ICONST_1);
+//        mv.visitInsn(Opcodes.IADD);
+//        mv.visitFieldInsn(Opcodes.PUTSTATIC, "app_agent/Counter", "stringConstructorCalls", "I");
     }
 
     private void visitAllocateArrayAfter(String arrayDesc) {

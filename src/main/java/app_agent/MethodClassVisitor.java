@@ -6,9 +6,13 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 public class MethodClassVisitor extends ClassVisitor {
+
+    private final String className;
+
     // Opcodes.ASM9  – Java 15+
-    public MethodClassVisitor(ClassWriter cv) {
+    public MethodClassVisitor(ClassWriter cv, String className) {
         super(Opcodes.ASM9, cv);
+        this.className = className;
     }
 
     @Override
@@ -19,6 +23,6 @@ public class MethodClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, descriptor, signature, exceptions);
-        return new StringCreationMethodVisitor(mv, access, name, descriptor, signature, exceptions);
+        return new StringCreationMethodVisitor(mv, access, name, descriptor, signature, exceptions, className);
     }
 }

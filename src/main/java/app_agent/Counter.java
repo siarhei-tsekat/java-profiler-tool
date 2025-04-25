@@ -2,18 +2,23 @@ package app_agent;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Counter {
-    public static int stringConstructorCalls = 0;
+    public static final HashMap<String, Integer> stringConstructorCalls = new HashMap<>();
 
-    public static void print() {
-        System.out.println("String constructor calls: " + stringConstructorCalls);
+    public static synchronized void increment(String location) {
+        stringConstructorCalls.put(location, stringConstructorCalls.getOrDefault(location, 0) + 1);
     }
 
     public static void printToFile(String path) {
         try (FileWriter writer = new FileWriter(path)) {
-            writer.write(stringConstructorCalls + "\n");
-            System.out.println("String constructor calls written to " + path);
+
+            for (Map.Entry<String, Integer> entry : stringConstructorCalls.entrySet()) {
+                writer.write(entry.getKey() + " -> " + entry.getValue());
+                writer.write("\\n");
+            }
         }
         catch (IOException e) {
             e.printStackTrace();
