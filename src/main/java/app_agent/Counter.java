@@ -17,7 +17,7 @@ public class Counter {
 
             for (Map.Entry<String, Integer> entry : stringConstructorCalls.entrySet()) {
                 writer.write(entry.getKey() + " -> " + entry.getValue());
-                writer.write("\\n");
+                writer.write(System.lineSeparator());
             }
         }
         catch (IOException e) {

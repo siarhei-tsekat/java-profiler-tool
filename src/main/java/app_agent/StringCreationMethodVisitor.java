@@ -1,9 +1,11 @@
 package app_agent;
 
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import static org.objectweb.asm.Opcodes.GETSTATIC;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 public class StringCreationMethodVisitor extends MethodVisitor {
     private final String methodName;
@@ -27,7 +29,7 @@ public class StringCreationMethodVisitor extends MethodVisitor {
     // Opcodes.ARETURN	Return object reference
     // Opcodes.POP	Pop the top stack value
     // Opcodes.DUP	Duplicate top of stack
-     // Opcodes.NOP	Do nothing
+    // Opcodes.NOP	Do nothing
 
     @Override
     public void visitInsn(int opcode) {
@@ -46,6 +48,83 @@ public class StringCreationMethodVisitor extends MethodVisitor {
 //        super.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
 //        super.visitLdcInsn("Method started " + name);
 //        super.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+
+        // Inject: StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+//        mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false);
+//        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
+//        mv.visitVarInsn(Opcodes.ASTORE, 1); // store in local variable 1 (assuming 0 is 'this')
+//
+//
+//        for (int i = 3; i < 6; i++) {
+//            Label skip = new Label();
+//
+//            mv.visitVarInsn(Opcodes.ALOAD, 1);                 // stack
+//            mv.visitInsn(Opcodes.ARRAYLENGTH);                 // stack.length
+//            mv.visitIntInsn(Opcodes.BIPUSH, i + 1);                // push 4
+//            mv.visitJumpInsn(Opcodes.IF_ICMPLT, skip);         // if length < 4 -> skip
+//
+//
+//            mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+//            mv.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
+//            mv.visitInsn(Opcodes.DUP);
+//            mv.visitLdcInsn("Caller #" + (i - 2) + ": ");
+//            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false);
+//            mv.visitVarInsn(Opcodes.ALOAD, 1);
+//            mv.visitIntInsn(Opcodes.BIPUSH, i);
+//            mv.visitInsn(Opcodes.AALOAD);
+//            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/Object;)Ljava/lang/StringBuilder;", false);
+//            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+//            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+//
+//            mv.visitLabel(skip);
+//        }
+
+        // StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+//        mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false);
+//        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
+//        mv.visitVarInsn(Opcodes.ASTORE, 1); // local var 1 = stack
+//
+//        // if (stack.length > 2) -> print current method
+//        Label skipCurrent = new Label();
+//        mv.visitVarInsn(Opcodes.ALOAD, 1);
+//        mv.visitInsn(Opcodes.ARRAYLENGTH);
+//        mv.visitIntInsn(Opcodes.BIPUSH, 3);
+//        mv.visitJumpInsn(Opcodes.IF_ICMPLT, skipCurrent);
+//
+//        mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+//        mv.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
+//        mv.visitInsn(Opcodes.DUP);
+//        mv.visitLdcInsn("Current method: ");
+//        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false);
+//        mv.visitVarInsn(Opcodes.ALOAD, 1);
+//        mv.visitIntInsn(Opcodes.BIPUSH, 2);
+//        mv.visitInsn(Opcodes.AALOAD);
+//        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/Object;)Ljava/lang/StringBuilder;", false);
+//        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+//        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+//
+//        mv.visitLabel(skipCurrent);
+//
+//        // if (stack.length > 3) -> print parent caller
+//        Label skipCaller = new Label();
+//        mv.visitVarInsn(Opcodes.ALOAD, 1);
+//        mv.visitInsn(Opcodes.ARRAYLENGTH);
+//        mv.visitIntInsn(Opcodes.BIPUSH, 4);
+//        mv.visitJumpInsn(Opcodes.IF_ICMPLT, skipCaller);
+//
+//        mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+//        mv.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
+//        mv.visitInsn(Opcodes.DUP);
+//        mv.visitLdcInsn("Called from: ");
+//        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false);
+//        mv.visitVarInsn(Opcodes.ALOAD, 1);
+//        mv.visitIntInsn(Opcodes.BIPUSH, 3);
+//        mv.visitInsn(Opcodes.AALOAD);
+//        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/Object;)Ljava/lang/StringBuilder;", false);
+//        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+//        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+//
+//        mv.visitLabel(skipCaller);
     }
 
     // used to emit type-specific JVM bytecode instructions—that is, instructions that operate on a class or interface type.
@@ -54,27 +133,73 @@ public class StringCreationMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitTypeInsn(int opcode, String desc) {
-        switch (opcode) {
-            case Opcodes.NEW:                   // Create new object
-                visitAllocateBefore(desc);
-                mv.visitTypeInsn(opcode, desc);
-                visitAllocateAfter(desc);
-                break;
-            case Opcodes.ANEWARRAY:             // Create new array of reference type
-                String arrayDesc = desc.startsWith("[") ? "[" + desc : "L" + desc + ";";
-                visitAllocateArrayBefore(arrayDesc);
-                mv.visitTypeInsn(opcode, desc);
-                visitAllocateArrayAfter(arrayDesc);
-                break;
-//            case Opcodes.CHECKCAST:           // Cast object to specific reference type
-//                System.out.println("Casting to " + desc);
+//        switch (opcode) {
+//            case Opcodes.NEW:                   // Create new object
+//                visitAllocateBefore(desc);
+//                mv.visitTypeInsn(opcode, desc);
+//                visitAllocateAfter(desc);
 //                break;
-//            case Opcodes.INSTANCEOF:          // Check if object is of given type
-//                System.out.println("Checking instanceof " + desc);
+//            case Opcodes.ANEWARRAY:             // Create new array of reference type
+//                String arrayDesc = desc.startsWith("[") ? "[" + desc : "L" + desc + ";";
+//                visitAllocateArrayBefore(arrayDesc);
+//                mv.visitTypeInsn(opcode, desc);
+//                visitAllocateArrayAfter(arrayDesc);
 //                break;
-            default:
-                mv.visitTypeInsn(opcode, desc);
+////            case Opcodes.CHECKCAST:           // Cast object to specific reference type
+////                System.out.println("Casting to " + desc);
+////                break;
+////            case Opcodes.INSTANCEOF:          // Check if object is of given type
+////                System.out.println("Checking instanceof " + desc);
+////                break;
+//            default:
+//                mv.visitTypeInsn(opcode, desc);
+//        }
+
+
+    }
+
+    @Override
+    public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+        super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+        // Detect: new String(); aka invokespecial java/lang/String.<init>
+        if (opcode == Opcodes.INVOKESPECIAL && owner.equals("java/lang/String") && name.equals("<init>")) {
+            injectRecordStringConstructor();
         }
+    }
+
+    private void injectRecordStringConstructor() {
+        // Thread.currentThread().getStackTrace()
+        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread",
+                "()Ljava/lang/Thread;", false);
+        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace",
+                "()[Ljava/lang/StackTraceElement;", false);
+        mv.visitVarInsn(Opcodes.ASTORE, 1); // local var 1 = stack
+
+        Label skip = new Label();
+
+        mv.visitVarInsn(Opcodes.ALOAD, 1);
+        mv.visitInsn(Opcodes.ARRAYLENGTH);
+        mv.visitIntInsn(Opcodes.BIPUSH, 4);
+        mv.visitJumpInsn(Opcodes.IF_ICMPLT, skip);
+
+        mv.visitVarInsn(Opcodes.ALOAD, 1);
+        mv.visitIntInsn(Opcodes.BIPUSH, 2);
+        mv.visitInsn(Opcodes.AALOAD);
+        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;", false);
+        mv.visitVarInsn(Opcodes.ASTORE, 2);
+
+        mv.visitVarInsn(Opcodes.ALOAD, 1);
+        mv.visitIntInsn(Opcodes.BIPUSH, 3);
+        mv.visitInsn(Opcodes.AALOAD);
+        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;", false);
+        mv.visitVarInsn(Opcodes.ASTORE, 3);
+
+        mv.visitVarInsn(Opcodes.ALOAD, 2);
+        mv.visitVarInsn(Opcodes.ALOAD, 3);
+        mv.visitMethodInsn(INVOKESTATIC, "app_agent/CallCounter", "recordStringConstructor",
+                "(Ljava/lang/String;Ljava/lang/String;)V", false);
+
+        mv.visitLabel(skip);
     }
 
     private void visitAllocateAfter(String desc) {
@@ -91,12 +216,7 @@ public class StringCreationMethodVisitor extends MethodVisitor {
 
         String location = className.replace('/', '.') + "::" + methodName + descriptor; // com.example.Main::<init>()
         mv.visitLdcInsn(location);
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC,
-                "app_agent/Counter",
-                "increment",
-                "(Ljava/lang/String;)V",
-                false
-        );
+        mv.visitMethodInsn(INVOKESTATIC, "app_agent/Counter", "increment", "(Ljava/lang/String;)V", false);
 
 
 
